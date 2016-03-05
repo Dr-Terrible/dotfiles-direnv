@@ -1,0 +1,7 @@
+# Generated automatically by bestow v0.4.0
+# See 'bestow help tutorial' for a detailed
+# user manual about be.stow syntax
+
+direnv {
+	.direnvrc
+}
