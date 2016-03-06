@@ -1,0 +1,14 @@
+# @FUNCTION: use_grunt
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_grunt() {
+	local version=$( grunt -V )
+	local grunt_cli="$( echo ${version} | cut -d ' ' -f 2)"
+
+	# TODO: if there isn't a local version, exit with error
+	local grunt_local="$( echo ${version} | cut -d ' ' -f 4 )"
+
+	echo "   ---> CLI   ${grunt_cli} from ${nodejs_prefix}/bin/grunt"
+	echo "   ---> Local ${grunt_local}"
+}

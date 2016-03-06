@@ -1,0 +1,12 @@
+# @FUNCTION: use_npm
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_npm() {
+	# TODO: npm config get prefix must not be empty
+	nodejs_prefix="$( npm config get prefix )"
+	PATH_add "${nodejs_prefix}/bin"
+
+	echo "   ---> from ${nodejs_prefix}/bin/npm"
+	echo "   ---> v$( npm -v )"
+}

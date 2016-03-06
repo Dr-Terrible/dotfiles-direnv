@@ -1,0 +1,8 @@
+# @FUNCTION: use_go
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_go() {
+	local version="$( go version | cut -d ' ' -f 3 )"
+	echo "   ---> ${version//go/v}"
+}

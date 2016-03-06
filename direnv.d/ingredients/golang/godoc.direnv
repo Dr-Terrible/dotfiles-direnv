@@ -1,0 +1,13 @@
+# @FUNCTION: use_godoc
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_godoc() {
+	# Setup instructions for 'godoc' command
+	alias gdoc="godoc -http=:6060 && vimb --profile godoc"
+
+	# TODO: find a cross-platform solution
+	echo "   ---> starting godoc on port 6060"
+	#systemctl --user start godoc
+	echo "   ---> use 'vimb -p gdoc' to access Go documentation"
+}

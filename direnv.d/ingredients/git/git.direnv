@@ -1,0 +1,8 @@
+# @FUNCTION: use_git
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_git() {
+	local version="$( git --version | cut -d ' ' -f 3 )"
+	echo "   ---> v${version}"
+}

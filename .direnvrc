@@ -1,230 +1,78 @@
 #!/bin/bash
 
-layout_gb() {
-	require go
-	require godoc
-	require gb
-}
+# This is the directory where all the recipes and ingredients are stored.
+# By default, it is an empty string.
+# If you want to use a different path, then override the default value with
+# and absolute path name which contains a direnv.d/ directory
+DIRENVD_DIR=""
 
-layout_go-profiling() {
-	require gofmt
-	require vet
-	require delve
-	require godef
-	require grind
-	require gometalinter
-	require gom
-}
 
-layout_go-bindata() {
-	require go-bindata
-}
+# @FUNCTION: concoct
+# @INTERNAL
+# @DESCRIPTION:
+#
+concoct() {
+	local cmd="${1}"
+	local recipe="${DIRENVD_DIR}/direnv.d/recipes/${1}.direnv"
 
-layout_hub() {
-	require git
-	require hub
+	# Load the required recipe from direnv.d directory
+	if [[ ! -r ${recipe} ]]; then
+		log_status "Unable to find recipe: ${cmd}!"
+	fi
+	source ${recipe}
 }
-
-layout_vimb() {
-	require vimb
-}
-
-layout_nodejs() {
-	require npm     # npm install -g  --verbose npm
-	require bower   # npm install -g  --verbose bower
-	require gulp    # npm install -g  --verbose gulp-cli
-	require grunt   # npm install -g  --verbose grunt-cli
-}
-
 
 # @FUNCTION: require
 # @INTERNAL
 # @DESCRIPTION:
 #
 require() {
-	local cmd="${1}"
+	local recipe="${1}"
+	local cmd="${2}"
+	local ingredient="${DIRENVD_DIR}/direnv.d/ingredients/${recipe}/${cmd}.direnv"
+
+	# Load the required ingredient from direnv.d directory
+	if [[ ! -r ${ingredient} ]]; then
+		log_status "Unable to find ingredient: ${cmd}!"
+	fi
+	source "${ingredient}"
 
 	# Detect the presence of the specified command
 	if ! has ${cmd}; then
-		log_status "Unable to find ${cmd}!"
+		log_status "Unable to find command: ${cmd}!"
 		exit 1
 	fi
 
 	shift
+	shift
 	use ${cmd} "$@"
 }
 
-# @FUNCTION: use_go
+
+# @FUNCTION: include
 # @INTERNAL
 # @DESCRIPTION:
 #
-use_go() {
-	local version="$( go version | cut -d ' ' -f 3 )"
-	echo "   ---> ${version//go/v}"
+include() {
+	if [[ -d ${1} ]]; then
+		for file in $( find ${1} -depth -mindepth 1 -type f -iname "*.direnv" ); do
+			source "${file}"
+		done
+	fi
 }
 
-# @FUNCTION: use_gofmt
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gofmt() { :; }
 
-# @FUNCTION: use_vet
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_vet() { :; }
+# Determine the location of the direnv.d directory
+if [[ -z ${DIRENVD_DIR} ]]; then
+	local direnvrc="$HOME/.direnvrc"
+	if [[ ! -L ${direnvrc} ]]; then
+		log_status "${direnvrc} is not a symbolic link!"
+		log_status "this Direnv recipe has not been installed by 'bestow'."
+		log_status "sorry, I cannot continue. Please, ask upstream for feedbacks:"
+		log_status "-  https://github.com/Dr-Terrible/dotfiles-direnv"
+		exit 1
+	fi
 
-# @FUNCTION: use_delve
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_delve() {
-	local version="$( dlv version | tail -n +2 | head -n -1 | cut -d ' ' -f 2 )"
-	echo "   ---> v${version}"
-}
-
-# @FUNCTION: use_gometalinter
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gometalinter() { :; }
-
-# @FUNCTION: use_godef
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_godef() { :; }
-
-# @FUNCTION: use_grind
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_grind() { :; }
-
-# @FUNCTION: use_gom
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gom() { :; }
-
-# @FUNCTION: use_gb
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gb() {
-	# Setup instructions for an environment suitable for a gb project
-	local path=""$( gb env GB_SRC_PATH )""
-	path_add GOPATH ${path}
-	path_add GOPATH "${path//\/src/}"  # required by tools like gotype
-	path_add GOBIN "${PWD}/bin"
-	path_add GOTOOLDIR "${PWD}/pkg/$( go env GOHOSTOS )_$( go env GOHOSTARCH )"
-	PATH_add "${GOBIN}"
-}
-
-# @FUNCTION: use_godoc
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_godoc() {
-	# Setup instructions for 'godoc' command
-	alias gdoc="godoc -http=:6060 && vimb --profile godoc"
-	echo "   ---> starting godoc on port 6060"
-	#systemctl --user start godoc
-	echo "   ---> use 'vimb -p gdoc' to access Go documentation"
-}
-
-# @FUNCTION: use_go-bindata
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_go-bindata() {
-	local version="$( go-bindata -version | head -n -1 | cut -d ' ' -f 2 )"
-	echo "   ---> v${version}"
-}
-
-# @FUNCTION: use_git
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_git() {
-	local version="$( git --version | cut -d ' ' -f 3 )"
-	echo "   ---> v${version}"
-}
-
-# @FUNCTION: use_hub
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_hub() {
-	local version="$( hub --version | tail -n +2 | cut -d ' ' -f 3 )"
-	echo "   ---> v${version}"
-
-	# Setup instructions for hub command
-	alias git=hub
-	echo "   ---> aliasing hub as git"
-}
-
-# @FUNCTION: use_vimb
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_vimb() {
-	local version="$( vimb -v | cut -d '/' -f 2 )"
-	echo "   ---> v${version}"
-
-	# Setup instructions for vimb command
-	path_add BROWSER "$( which --skip-tilde vimb )"
-}
-
-# @FUNCTION: use_npm
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_npm() {
-	# TODO: npm config get prefix must not be empty
-	nodejs_prefix="$( npm config get prefix )"
-	PATH_add "${nodejs_prefix}/bin"
-
-	echo "   ---> from ${nodejs_prefix}/bin/npm"
-	echo "   ---> v$( npm -v )"
-}
-
-# @FUNCTION: use_bower
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_bower() {
-	echo "   ---> from ${nodejs_prefix}/bin/bower"
-	echo "   ---> v$( bower -v )"
-}
-
-# @FUNCTION: use_grunt
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_grunt() {
-	local version=$( grunt -V )
-	local grunt_cli="$( echo ${version} | cut -d ' ' -f 2)"
-
-	# TODO: if there isn't a local version, exit with error
-	local grunt_local="$( echo ${version} | cut -d ' ' -f 4 )"
-
-	echo "   ---> CLI   ${grunt_cli} from ${nodejs_prefix}/bin/grunt"
-	echo "   ---> Local ${grunt_local}"
-}
-
-# @FUNCTION: use_gulp
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gulp() {
-	local version=$( gulp -v )
-	local gulp_cli="$( echo ${version} | cut -d ' ' -f 4 )"
-
-	# TODO: if there isn't a local version, exit with error
-	local gulp_local="$( echo ${version} | cut -d ' ' -f 8 )"
-
-	echo "   ---> CLI   v${gulp_cli} from ${nodejs_prefix}/bin/gulp"
-	echo "   ---> Local v${gulp_local} from ./node_modules/.bin/gulp"
-}
+	DIRENVD_DIR="$( readlink ${direnvrc} )"
+	DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )"
+fi

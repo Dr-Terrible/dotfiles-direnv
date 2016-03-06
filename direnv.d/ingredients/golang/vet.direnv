@@ -1,0 +1,5 @@
+# @FUNCTION: use_vet
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_vet() { :; }

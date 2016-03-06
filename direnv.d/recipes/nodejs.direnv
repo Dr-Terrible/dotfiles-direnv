@@ -1,0 +1,4 @@
+require nodejs npm     # npm install -g --verbose npm
+require nodejs bower   # npm install -g --verbose bower
+require nodejs gulp    # npm install -g --verbose gulp-cli
+require nodejs grunt   # npm install -g --verbose grunt-cli

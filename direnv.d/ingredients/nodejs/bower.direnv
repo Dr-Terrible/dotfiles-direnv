@@ -1,0 +1,8 @@
+# @FUNCTION: use_bower
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_bower() {
+	echo "   ---> from ${nodejs_prefix}/bin/bower"
+	echo "   ---> v$( bower -v )"
+}

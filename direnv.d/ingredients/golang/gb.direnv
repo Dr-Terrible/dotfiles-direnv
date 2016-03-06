@@ -1,0 +1,13 @@
+# @FUNCTION: use_gb
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gb() {
+	# Setup instructions for an environment suitable for a gb project
+	local path=""$( gb env GB_SRC_PATH )""
+	path_add GOPATH ${path}
+	#path_add GOPATH "${path//\/src/}"  # required by tools like gotype
+	path_add GOBIN "${PWD}/bin"
+	path_add GOTOOLDIR "${PWD}/pkg/$( go env GOHOSTOS )_$( go env GOHOSTARCH )"
+	PATH_add "${GOBIN}"
+}

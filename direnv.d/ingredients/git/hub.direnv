@@ -1,0 +1,12 @@
+# @FUNCTION: use_hub
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_hub() {
+	local version="$( hub --version | tail -n +2 | cut -d ' ' -f 3 )"
+	echo "   ---> v${version}"
+
+	# Setup instructions for hub command
+	alias git=hub
+	echo "   ---> aliasing hub as git"
+}

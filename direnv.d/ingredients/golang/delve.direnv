@@ -1,0 +1,8 @@
+# @FUNCTION: use_delve
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_delve() {
+	local version="$( dlv version | tail -n +2 | head -n -1 | cut -d ' ' -f 2 )"
+	echo "   ---> v${version}"
+}

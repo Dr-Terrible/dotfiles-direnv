@@ -1,0 +1,7 @@
+require golang gofmt
+require golang vet
+require golang delve
+require golang godef
+require golang grind
+require golang gometalinter
+require golang gom

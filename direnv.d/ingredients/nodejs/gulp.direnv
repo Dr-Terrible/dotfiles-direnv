@@ -1,0 +1,14 @@
+# @FUNCTION: use_gulp
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gulp() {
+	local version=$( gulp -v )
+	local gulp_cli="$( echo ${version} | cut -d ' ' -f 4 )"
+
+	# TODO: if there isn't a local version, exit with error
+	local gulp_local="$( echo ${version} | cut -d ' ' -f 8 )"
+
+	echo "   ---> CLI   v${gulp_cli} from ${nodejs_prefix}/bin/gulp"
+	echo "   ---> Local v${gulp_local} from ./node_modules/.bin/gulp"
+}
