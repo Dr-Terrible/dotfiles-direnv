@@ -1,0 +1,5 @@
+# @FUNCTION: use_prdeps
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_prdeps() { :; }

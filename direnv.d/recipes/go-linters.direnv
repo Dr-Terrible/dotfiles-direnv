@@ -1,0 +1,10 @@
+# Recipe for Golang linters
+
+require golang gofmt
+require golang vet
+require golang grind
+require golang gometalinter
+require golang prdeps
+require golang depscheck
+require golang gosimple
+require golang unused
