@@ -1,0 +1,5 @@
+# @FUNCTION: use_structlayout
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_structlayout() { :; }

@@ -1,7 +1,7 @@
-require golang gofmt
-require golang vet
+# Recipe for Golang profiling tools
+
 require golang delve
 require golang godef
-require golang grind
-require golang gometalinter
 require golang gom
+require golang gcvis
+require golang structlayout
