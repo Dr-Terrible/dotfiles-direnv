@@ -1,18 +1,96 @@
-#!/bin/bash
+#!/usr/bin/env sh
+set -eo pipefail
 
 # This is the directory where all the recipes and ingredients are stored.
 # By default, it is an empty string.
 # If you want to use a different path, then override the default value with
-# and absolute path name which contains a direnv.d/ directory
+# and absolute path name pointing to a direnv.d/ directory
 DIRENVD_DIR=""
 
 
-# @FUNCTION: concoct
-# @INTERNAL
-# @DESCRIPTION:
+# @FUNCTION: project
+# @USAGE: project <name>
 #
+# @DESCRIPTION:
+# This function expands the supplied <name> to the environment variable PROJECT.
+# If <name> is a Golang import path, then <name> is automatically expanded to
+# the environment variable VANITY which will hold the vanity import path of the
+# project.
+#
+# Example:
+#    $ cat ~/my/project/.envrc
+#    project darkstar
+#
+#    $ direnv allow ~/my/project/.envrc
+#    direnv: loading ~/.direnvrc
+#    direnv: loading .envrc
+#    direnv: export +PROJECT
+#
+#    $ env | grep PROJECT
+#    PROJECT=darkstar
+#
+# Example (Golang import path)
+#    $ cat ~/my/project/.envrc
+#    project github.com/wonderboy/darkstar
+#
+#    $ direnv allow ~/my/project/.envrc
+#    direnv: loading ~/.direnvrc
+#    direnv: loading .envrc
+#    direnv: export +PROJECT +VANITY
+#
+#    $ env | grep PROJECT
+#    PROJECT=darkstar
+#
+#    $ env | grep VANITY
+#    VANITY=github.com/wonderboy/darkstar
+project() {
+	local name="${1:-empty}"
+
+	# Exit if the project name is empty
+	if [[ "empty" == ${name##*/} ]]; then
+		log_status "You must supply a valid project name when invoking project()!"
+		exit 1
+	fi
+
+	# Export PROJECT
+	export PROJECT="${name##*/}"
+
+	# Export VANITY (only if different from PROJECT)
+	[[ ${PROJECT} == ${name} ]] && return
+	export VANITY="${name}"
+}
+
+
+# @FUNCTION: concoct
+# @USAGE: concoct <recipe>
+#
+# @DESCRIPTION:
+# This function loads the supplied <recipe>.
 concoct() {
+
+	# Determine the location of the direnv.d directory
+	if [[ -z ${DIRENVD_DIR} ]]; then
+		local direnvrc="$HOME/.direnvrc"
+		if [[ ! -L ${direnvrc} ]]; then
+			log_status "${direnvrc} is not a symbolic link!"
+			log_status "this Direnv recipe has not been installed by 'bestow'."
+			log_status "sorry, I cannot continue. Please, ask upstream for feedbacks:"
+			log_status "-  https://github.com/Dr-Terrible/dotfiles-direnv"
+			exit 1
+		fi
+
+		DIRENVD_DIR="$( readlink ${direnvrc} )"
+		DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )"
+	fi
+
 	local cmd="${1}"
+
+	# Exit if the recipe name is empty
+	if [[ -z $( echo ${cmd} ) ]]; then
+		log_status "You must supply a valid recipe name when invoking concoct()!"
+		exit 1
+	fi
+
 	local recipe="${DIRENVD_DIR}/direnv.d/recipes/${1}.direnv"
 
 	# Load the required recipe from direnv.d directory
@@ -23,17 +101,26 @@ concoct() {
 }
 
 # @FUNCTION: require
-# @INTERNAL
-# @DESCRIPTION:
+# @USAGE: require <food container> <ingredient>
 #
+# @DESCRIPTION:
+# This function loads an <ingredient> from a specific <food container>. If the
+# <food container>, or the <ingredient>, doesn't exist, the function returns
+# an error. This helper function is supposed to be used by recipes only.
+#
+# NOTE: Works like Direnv's use() function, except that the required external
+# dependencies must be installed to allow Direnv to complete the set up of
+# the environment.
 require() {
-	local recipe="${1}"
-	local cmd="${2}"
-	local ingredient="${DIRENVD_DIR}/direnv.d/ingredients/${recipe}/${cmd}.direnv"
+	local container="${1:-empty}"
+	local cmd="${2:-empty}"
+	local ingredient="${DIRENVD_DIR}/direnv.d/ingredients/${container}/${cmd}.direnv"
 
 	# Load the required ingredient from direnv.d directory
 	if [[ ! -r ${ingredient} ]]; then
 		log_status "Unable to find ingredient: ${cmd}!"
+		log_status "No such file or directory: ${ingredient}"
+		exit 1
 	fi
 	source "${ingredient}"
 
@@ -51,8 +138,8 @@ require() {
 
 # @FUNCTION: include
 # @INTERNAL
-# @DESCRIPTION:
-#
+# @DEPRECATED
+# This helper function will be removed soon; don't use it.
 include() {
 	if [[ -d ${1} ]]; then
 		for file in $( find ${1} -depth -mindepth 1 -type f -iname "*.direnv" ); do
@@ -60,19 +147,3 @@ include() {
 		done
 	fi
 }
-
-
-# Determine the location of the direnv.d directory
-if [[ -z ${DIRENVD_DIR} ]]; then
-	local direnvrc="$HOME/.direnvrc"
-	if [[ ! -L ${direnvrc} ]]; then
-		log_status "${direnvrc} is not a symbolic link!"
-		log_status "this Direnv recipe has not been installed by 'bestow'."
-		log_status "sorry, I cannot continue. Please, ask upstream for feedbacks:"
-		log_status "-  https://github.com/Dr-Terrible/dotfiles-direnv"
-		exit 1
-	fi
-
-	DIRENVD_DIR="$( readlink ${direnvrc} )"
-	DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )"
-fi
