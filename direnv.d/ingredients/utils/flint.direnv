@@ -1,0 +1,8 @@
+# @FUNCTION: use_flint
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_flint() {
+	local version="$( flint -v | cut -d ' ' -f 3 )"
+	echo "   ---> v${version}"
+}

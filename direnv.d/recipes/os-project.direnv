@@ -1,0 +1,4 @@
+# Recipe for an open-source project
+
+require utils flint
+require golang anderson
