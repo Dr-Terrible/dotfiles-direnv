@@ -1,0 +1,10 @@
+# Recipe for Golang source code generators.
+
+require golang gen              # Type-driven code generation for GoLang
+require golang xo               # Type-driven and Func-driven code generation
+                                # based on a database schema
+require golang xmljson2struct
+require golang rts
+require golang re2dfa
+require golang gopherjs
+require golang ffjson
