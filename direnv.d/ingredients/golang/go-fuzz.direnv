@@ -1,0 +1,5 @@
+# @FUNCTION: use_go-fuzz
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_go-fuzz() { :; }

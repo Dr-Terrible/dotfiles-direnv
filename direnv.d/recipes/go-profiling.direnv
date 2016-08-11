@@ -3,5 +3,7 @@
 require golang delve
 require golang godef
 require golang gom
+require golang go-torch
+require golang go-fuzz
 require golang gcvis
 require golang structlayout
