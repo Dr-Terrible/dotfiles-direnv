@@ -5,4 +5,7 @@
 use_git() {
 	local version="$( git --version | cut -d ' ' -f 3 )"
 	echo "   ---> v${version}"
+
+	# see https://github.com/keybase/keybase-issues/issues/1712
+	export GPG_TTY=$(tty)
 }
