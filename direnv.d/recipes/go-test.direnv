@@ -1,0 +1,4 @@
+# Recipe for Golang Unit Testing tools
+
+require golang mockgen
+require golang ginkgo
