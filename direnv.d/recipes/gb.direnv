@@ -1,3 +1,2 @@
 require golang go
-require golang godoc
 require golang gb
