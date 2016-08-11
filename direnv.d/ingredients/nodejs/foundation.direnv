@@ -1,0 +1,8 @@
+# @FUNCTION: use_foundation
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_foundation() {
+	echo "   ---> from ${nodejs_prefix}/bin/foundation"
+	echo "   ---> v$( foundation -v | cut -d ' ' -f 4 )"
+}
