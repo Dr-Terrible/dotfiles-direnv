@@ -5,4 +5,7 @@
 use_go() {
 	local version="$( go version | cut -d ' ' -f 3 )"
 	echo "   ---> ${version//go/v}"
+
+	# Exports all the binaries from the Golang tool directory
+	PATH_add "$(go env GOTOOLDIR)"
 }

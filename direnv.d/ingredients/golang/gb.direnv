@@ -4,7 +4,7 @@
 #
 use_gb() {
 	# Setup instructions for an environment suitable for a gb project
-	local path=""$( gb env GB_SRC_PATH )""
+	local path=""$( gb env GB_SRC_PATH | sed -e "s:/src::g" )""
 	path_add GOPATH ${path}
 	#path_add GOPATH "${path//\/src/}"  # required by tools like gotype
 	path_add GOBIN "${PWD}/bin"
