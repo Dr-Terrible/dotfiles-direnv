@@ -6,5 +6,5 @@ require golang grind
 require golang gometalinter
 require golang prdeps
 require golang depscheck
-require golang gosimple
+require golang simple
 require golang unused

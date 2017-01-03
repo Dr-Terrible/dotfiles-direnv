@@ -1,0 +1,2 @@
+#require shell shellcheck
+require shell zshdb

@@ -1,5 +1,0 @@
-# @FUNCTION: use_gosimple
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_gosimple() { :; }

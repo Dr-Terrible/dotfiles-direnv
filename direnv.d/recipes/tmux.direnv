@@ -1,0 +1,4 @@
+require shell tmux
+
+# TODO: add tmux-resurrect support
+#require shell tmux-resurrect

@@ -1,0 +1,78 @@
+# @FUNCTION: use_tmux
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_tmux() {
+	local version="$( tmux -V | cut -d ' ' -f 2 )"
+	echo "   ---> v${version}"
+}
+
+# @FUNCTION: tmux_new
+# @DESCRIPTION:
+#
+# Creates a new named session with tmux.
+# The tmux session is created but now opened because it is launched
+# in detached mode.
+#
+# In a terminal use 'tmux-open $PROJECT' to attach to the current running
+# session created by direnv.
+function tmux_new() {
+	local session_name="${1:-empty}"
+	local options="-P -d"
+	local conf_file="./conf/tmux.conf"
+
+	# TODO: check that zsh function tmux-open exists
+	local fmt="${session_name}"
+
+	# Exit if the session name is empty
+	if [[ "empty" == ${session_name} ]]; then
+		log_status "You must supply a valid session name when invoking ${function_name}!"
+		exit 1
+	fi
+
+	# Convert any dots (.) into hyphens characters
+	session_name="${session_name//./-}"
+
+	# If the tmux session already exists, then return
+	tmux has-session -t "${session_name}" > /dev/null 2>&1
+	if [ $? == 0 ]; then
+		echo "   ---> existing session: ${fmt}"
+		return
+	fi
+
+	# If an alternative tmux's configuration file exists
+	# for the local project, then use it
+	# TODO: fix it
+	#if [ -r ${config_file} ]; then
+	#	options+=" -f ${config_file}"
+	#fi
+
+	# Create a new tmux session
+	tmux new-session \
+		${options} \
+		-s "${session_name}" \
+		-F "   ---> create new session: ${fmt}"
+}
+
+# @FUNCTION: _validate_session_name
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This helper function strips any leading-trailing white space from a session
+# name, and converts any dots (.) into hyphens characters.
+function _validate_session_name() {
+	local session_name="${1:-empty}"
+	local function_name="${2}"
+
+	# Strip any leading and trailing white spaces
+	session_name=$( echo ${session_name} )
+
+	# Exit if the session name is empty
+	if [[ "empty" == ${session_name} ]]; then
+		log_status "You must supply a valid session name when invoking ${function_name}!"
+		exit 1
+	fi
+
+	# Convert any dots (.) into hyphens characters
+	echo "${session_name//./-}"
+}

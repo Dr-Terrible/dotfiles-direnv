@@ -1,0 +1,8 @@
+# @FUNCTION: use_shellcheck
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_shellcheck() {
+	local version="$( shellcheck -V | cut -d ' ' -f 2 )"
+	echo "   ---> v${version}"
+}
