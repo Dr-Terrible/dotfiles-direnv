@@ -80,7 +80,7 @@ concoct() {
 		fi
 
 		DIRENVD_DIR="$( readlink ${direnvrc} )"
-		DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )"
+		DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )/direnv.d"
 	fi
 
 	local cmd="${1}"
@@ -91,7 +91,7 @@ concoct() {
 		exit 1
 	fi
 
-	local recipe="${DIRENVD_DIR}/direnv.d/recipes/${1}.direnv"
+	local recipe="${DIRENVD_DIR}/recipes/${1}.direnv"
 
 	# Load the required recipe from direnv.d directory
 	if [[ ! -r ${recipe} ]]; then
@@ -114,7 +114,7 @@ concoct() {
 require() {
 	local container="${1:-empty}"
 	local cmd="${2:-empty}"
-	local ingredient="${DIRENVD_DIR}/direnv.d/ingredients/${container}/${cmd}.direnv"
+	local ingredient="${DIRENVD_DIR}/ingredients/${container}/${cmd}.direnv"
 
 	# Load the required ingredient from direnv.d directory
 	if [[ ! -r ${ingredient} ]]; then
@@ -133,6 +133,20 @@ require() {
 	shift
 	shift
 	use ${cmd} "$@"
+}
+
+# @FUNCTION:
+# @USAGE: make_dir <directory> ... <directotyN>
+#
+# @DESCRIPTION:
+# This helper function creates the given directories, if they 
+# do not already exist.
+make_dir() {
+	for dir in $@; do
+		[[ -d ${dir} ]] && continue
+		mkdir -p ${dir}
+		echo "   ---> created: ${dir//${PWD}\//}/"
+	done
 }
 
 
