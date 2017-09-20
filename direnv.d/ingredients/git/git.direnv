@@ -4,8 +4,38 @@
 #
 use_git() {
 	local version="$( git --version | cut -d ' ' -f 3 )"
-	printf "v${version}"
+	printf "v${version}\n"
 
 	# see https://github.com/keybase/keybase-issues/issues/1712
-	export GPG_TTY=$(tty)
+	[ -z "$GPG_TTY" ] && export GPG_TTY=$(tty)
+
+	if [ -d "${GOPATH}/.git" ]; then
+		log_error "warning: git repository inside $GOPATH instead of $GOPATH/src/$VANITY"
+		return
+	fi
+
+
+	# Execute git commands under lock to avoid races.
+	(
+		flock 9 || return -1
+
+		# Extract the absolute vanity path
+        local vanity_path="$GOPATH/src/$VANITY"
+
+		pushd "${vanity_path}" > /dev/null
+
+			# NOTE: we re-run 'git init' even if the repository is already created
+			#       to pick up newly added templates and to update stuff when a new
+			#       version of git is used.
+			printf "   >>>> "
+			git init
+
+			# Clean up the Git repository, if necessary
+			git gc -q --auto
+			printf "   >>>> done housekeeping tasks within the current Git repository\n"
+
+		popd > /dev/null
+
+
+	) 9>./tmp/git-init.lock
 }
