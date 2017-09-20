@@ -1,0 +1,5 @@
+# @FUNCTION: use_gomvpkg
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gomvpkg() { :; }

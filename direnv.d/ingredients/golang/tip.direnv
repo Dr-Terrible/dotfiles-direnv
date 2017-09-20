@@ -1,0 +1,5 @@
+# @FUNCTION: use_tip
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_tip() { :; }

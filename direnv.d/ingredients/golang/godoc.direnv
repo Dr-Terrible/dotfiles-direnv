@@ -1,0 +1,39 @@
+# @FUNCTION: use_godoc
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_godoc() {
+	printf "\n"
+
+	# GOPATH must not be empty
+	if [ -z "${GOPATH}" ]; then
+		log_error "Environment variable \$GOPATH is missing"
+		exit 1
+	fi
+
+	# If a godoc session is already running, print its HTTP address
+	# systemctl --user is-active godoc\@$( echo $GOPATH | tr / - )
+	if [ -e "${GOPATH}/.godoc" ]; then
+		printf "   >>>> godoc already running at 127.0.0.1:$( get_port )\n"
+		return
+	fi
+
+	# Start a new session
+	printf "   >>>> running godoc session at "
+	systemctl --user daemon-reload
+	systemctl --user start godoc@${GOPATH}
+	while [[ ! -r "${GOPATH}/.godoc" ]] ; do
+		if command -pv sleep >/dev/null 2>&1; then
+			sleep 0.1s
+			printf "."
+		fi
+	done
+	printf " 127.0.0.1:$( get_port )\n"
+}
+
+function use_systemctl() { :; }
+
+function get_port() {
+	[ ! -e "${GOPATH}/.godoc" ] && return
+	echo "$( cat ${GOPATH}/.godoc )"
+}

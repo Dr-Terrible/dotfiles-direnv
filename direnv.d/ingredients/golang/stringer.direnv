@@ -1,0 +1,5 @@
+# @FUNCTION: use_stringer
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_stringer() { :; }

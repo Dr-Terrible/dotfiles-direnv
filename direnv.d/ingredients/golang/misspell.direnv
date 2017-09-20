@@ -1,0 +1,5 @@
+# @FUNCTION: use_misspell
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_misspell() { :; }

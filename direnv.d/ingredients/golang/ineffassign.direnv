@@ -1,0 +1,5 @@
+# @FUNCTION: use_ineffassign
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_ineffassign() { :; }

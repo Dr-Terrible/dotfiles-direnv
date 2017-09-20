@@ -1,0 +1,5 @@
+# @FUNCTION: use_gocyclo
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gocyclo() { :; }

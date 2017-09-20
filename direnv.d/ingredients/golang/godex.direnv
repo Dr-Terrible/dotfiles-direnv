@@ -1,0 +1,5 @@
+# @FUNCTION: use_godex
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_godex() { :; }

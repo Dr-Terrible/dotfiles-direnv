@@ -1,0 +1,5 @@
+# @FUNCTION: use_gas
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gas() { :; }

@@ -1,0 +1,5 @@
+# @FUNCTION: use_gorename
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gorename() { :; }

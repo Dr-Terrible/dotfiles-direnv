@@ -1,0 +1,5 @@
+# @FUNCTION: use_toolstash
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_toolstash() { :; }

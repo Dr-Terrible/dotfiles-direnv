@@ -1,0 +1,5 @@
+# @FUNCTION: use_html2article
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_html2article() { :; }

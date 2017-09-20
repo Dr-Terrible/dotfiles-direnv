@@ -1,0 +1,5 @@
+# @FUNCTION: use_deadcode
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_deadcode() { :; }

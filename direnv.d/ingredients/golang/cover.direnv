@@ -1,0 +1,5 @@
+# @FUNCTION: use_cover
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_cover() { :; }

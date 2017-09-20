@@ -1,0 +1,5 @@
+# @FUNCTION: use_goimports
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_goimports() { :; }

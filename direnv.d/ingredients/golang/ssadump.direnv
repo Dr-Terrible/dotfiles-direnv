@@ -1,0 +1,5 @@
+# @FUNCTION: use_ssadump
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_ssadump() { :; }
