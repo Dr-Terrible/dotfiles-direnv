@@ -7,5 +7,5 @@ use_vimb() {
 	printf "v${version}"
 
 	# Setup instructions for vimb command
-	path_add BROWSER "$( which --skip-tilde vimb )"
+	path_add BROWSER "$( command -pv vimb )"
 }
