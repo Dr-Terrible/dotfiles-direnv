@@ -43,12 +43,12 @@ DIRENVD_DIR=""
 #
 #    $ env | grep VANITY
 #    VANITY=github.com/wonderboy/darkstar
-project() {
+function project() {
 	local name="${1:-empty}"
 
 	# Exit if the project name is empty
 	if [[ "empty" == ${name##*/} ]]; then
-		log_status "You must supply a valid project name when invoking project()!"
+		log_error "You must supply a valid project name when invoking project()!"
 		exit 1
 	fi
 
@@ -66,16 +66,16 @@ project() {
 #
 # @DESCRIPTION:
 # This function loads the supplied <recipe>.
-concoct() {
+function concoct() {
 
 	# Determine the location of the direnv.d directory
 	if [[ -z ${DIRENVD_DIR} ]]; then
 		local direnvrc="$HOME/.direnvrc"
 		if [[ ! -L ${direnvrc} ]]; then
-			log_status "${direnvrc} is not a symbolic link!"
-			log_status "this Direnv recipe has not been installed by 'bestow'."
-			log_status "sorry, I cannot continue. Please, ask upstream for feedbacks:"
-			log_status "-  https://github.com/Dr-Terrible/dotfiles-direnv"
+			log_error "${direnvrc} is not a symbolic link!"
+			log_error "this Direnv recipe has not been installed by 'bestow'."
+			log_error "sorry, I cannot continue. Please, ask upstream for feedbacks:"
+			log_error "-  https://github.com/Dr-Terrible/dotfiles-direnv"
 			exit 1
 		fi
 
@@ -87,7 +87,7 @@ concoct() {
 
 	# Exit if the recipe name is empty
 	if [[ -z $( echo ${cmd} ) ]]; then
-		log_status "You must supply a valid recipe name when invoking concoct()!"
+		log_error "You must supply a valid recipe name when invoking concoct()!"
 		exit 1
 	fi
 
@@ -95,8 +95,11 @@ concoct() {
 
 	# Load the required recipe from direnv.d directory
 	if [[ ! -r ${recipe} ]]; then
-		log_status "Unable to find recipe: ${cmd}!"
+		log_error "Unable to find recipe: ${cmd}!"
+		exit 1
 	fi
+
+	log_status "checking ${cmd}"
 	source ${recipe}
 }
 
@@ -111,41 +114,116 @@ concoct() {
 # NOTE: Works like Direnv's use() function, except that the required external
 # dependencies must be installed to allow Direnv to complete the set up of
 # the environment.
-require() {
+function require() {
 	local container="${1:-empty}"
 	local cmd="${2:-empty}"
 	local ingredient="${DIRENVD_DIR}/ingredients/${container}/${cmd}.direnv"
 
 	# Load the required ingredient from direnv.d directory
 	if [[ ! -r ${ingredient} ]]; then
-		log_status "Unable to find ingredient: ${cmd}!"
-		log_status "No such file or directory: ${ingredient}"
+		log_error "Unable to find ingredient: ${cmd}!"
+		log_error "No such file or directory: ${ingredient}"
 		exit 1
 	fi
 	source "${ingredient}"
 
 	# Detect the presence of the specified command
 	if ! has ${cmd}; then
-		log_status "Unable to find command: ${cmd}!"
+		log_error "Unable to find command: ${cmd}!"
 		exit 1
 	fi
 
 	shift
 	shift
-	use ${cmd} "$@"
+	local DIRENV_LOG_FORMAT="   ---> %s"
+	usepkg ${cmd} "$@"
 }
+
+# Usage: log_status_nonewline [<message> ...]
+#
+# Logs a status message whithout the trailing newline char.
+# Acts like echo, but wraps output in the standard direnv log format
+# (controlled by $DIRENV_LOG_FORMAT), and directs it to stderr
+# rather than stdout.
+#
+# Example:
+#
+#    log_status_nonewline "Loading ..."
+#
+function log_status_nonewline() {
+	if [[ -n $DIRENV_LOG_FORMAT ]]; then
+		local msg=$*
+		# shellcheck disable=SC2059
+		printf "${DIRENV_LOG_FORMAT}" "$msg" >&2
+	fi
+}
+
+# Usage: usepkg <program_name> [<version>]
+#
+# A semantic command dispatch intended for loading external dependencies into
+# the environment.
+#
+# Example:
+#
+#    use_go() {
+#      local version="$( go version | cut -d ' ' -f 3 )"
+#      echo "Go ${version//go/v}"
+#    }
+#    usepkg go
+#    # output: go v1.9
+#
+function usepkg() {
+	local cmd=$1
+	log_status_nonewline "found $* "
+	shift
+	"use_$cmd" "$@"
+	printf "\n"
+}
+
 
 # @FUNCTION:
 # @USAGE: make_dir <directory> ... <directotyN>
 #
 # @DESCRIPTION:
-# This helper function creates the given directories, if they 
-# do not already exist.
-make_dir() {
+# This helper function creates the given directories,
+# if they do not already exist.
+function make_dir() {
 	for dir in $@; do
 		[[ -d ${dir} ]] && continue
 		mkdir -p ${dir}
-		echo "   ---> created: ${dir//${PWD}\//}/"
+		echo "   >>>> created: ${dir//${PWD}\//}/"
+	done
+}
+
+# @FUNCTION:
+# @USAGE: make_tmpfs <directory>
+#
+# @DESCRIPTION:
+# This helper function creates a temporary directory that won't clash with other
+# running envrc processes, and avoids race conditions if possible.
+function make_tmpfs() {
+	for dir in $@; do
+		[[ -d ${dir} ]] && continue
+		# TODO: find a way to execute the mount without requiring root privilegies.
+		#       possibly, try to use systemd services for mounting points.
+		#       for now we use symlinks to /tmp
+		#mount -t tmpfs none ${dir} -o 'rw,nosuid,nodev,noexec,noauto,nouser,owner,lazytime,async'
+
+		if ! command -pv mktemp >/dev/null ; then
+			log_error "Command 'mktemp' not found"
+			return -1
+		fi
+
+		local template="envrc-${USER}"
+		mkdir -p "${TMPDIR-/tmp}/${template}"
+
+		if [ -z "${PROJECT}" ]; then
+			log_error "Environment variable \$PROJECT is missing"
+			return -1
+		fi
+		local tempdir=$( mktemp --tmpdir --suffix="-${dir//${PWD}\//}" -d "${template}/${PROJECT}-XXXXXXXX" )
+		ln -sf "${tempdir}" "${dir//${PWD}\//}"
+		echo "   >>>> mounted ${dir//${PWD}\//} -> ${tempdir}"
 	done
 }
 
@@ -154,7 +232,7 @@ make_dir() {
 # @INTERNAL
 # @DEPRECATED
 # This helper function will be removed soon; don't use it.
-include() {
+function include() {
 	if [[ -d ${1} ]]; then
 		for file in $( find ${1} -depth -mindepth 1 -type f -iname "*.direnv" ); do
 			source "${file}"
