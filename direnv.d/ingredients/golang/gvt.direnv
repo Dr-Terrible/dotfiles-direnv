@@ -2,29 +2,32 @@
 # @INTERNAL
 #
 # @DESCRIPTION:
-# This helper function sets up Go workspace suitable for
-# a project that uses gvt as a vendoring tool.
+# This helper function sets up a Go workspace suitable for
+# a project that uses 'gvt' as a vendoring tool.
+#
+# The resulting project structure will be as follow:
+# .
+# ├── bin/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-bin
+# ├── tmp/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-tmp
+# └── src/
+#     └── $VANITY/          <--- *your source code goes there*
+#         ├── vendor/
+#         └── manifest
 use_gvt() {
+	printf "\n"
+
 	# Set up instructions for an environment suitable
 	# for a Go project that uses gvt tool.
-	local gobin="${PWD}/bin"
+	unset GOPATH
+	unset GOBIN
 	path_add GOPATH "${PWD}"
-	path_add GOBIN "${gobin}"
+	path_add GOBIN "${GOPATH}/bin"
+	PATH_add "${GOBIN}"
 
 	# Create some local directories, if necessary
-	make_dir "${gobin}"
-	make_dir "${PWD}/vendor"
-	make_dir "${PWD}/pkg"
-	make_dir "${PWD}/coverage"
-	make_dir "${PWD}/src/${VANITY}"
-
-	# TODO: this trick should not be necessary
-	# symlink vendor/ as vendor/src, and export vendor/ to PATH
-	# fix: go1.7.3 not detecting the vendored
-	ln -sf vendor vendor/src
-	path_add GOPATH "${PWD}/vendor"
-
-	# Add GOROOT (Go internal binaries) and GOBIN to PATH
-	PATH_add "$( go env GOROOT )/bin"
-	PATH_add "${GOBIN}"
+	make_tmpfs "${GOBIN}"
+	make_tmpfs "${GOPATH}/tmp"
+	make_dir "${GOPATH}/tmp/coverage"
+	make_dir "${GOPATH}/tmp/profiling"
+	make_dir "${GOPATH}/src/${VANITY}/vendor"
 }
