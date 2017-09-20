@@ -1,13 +1,50 @@
 # @FUNCTION: use_gb
 # @INTERNAL
 # @DESCRIPTION:
+# This helper function sets up a Go workspace suitable for
+# a project that uses 'gb' as a vendoring tool.
+#
+# The resulting project structure will be as follow:
+# .
+# ├── bin/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-bin
+# ├── pkg/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-pkg
+# ├── tmp/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-tmp
+# ├── vendor/
+# │   └── src/              <--- exported in $GOPATH
+# └── src/
+#     └── $VANITY/          <--- *your source code goes there*
 #
 use_gb() {
-	# Setup instructions for an environment suitable for a gb project
-	local path=""$( gb env GB_SRC_PATH | sed -e "s:/src::g" )""
-	path_add GOPATH ${path}
-	#path_add GOPATH "${path//\/src/}"  # required by tools like gotype
-	path_add GOBIN "${PWD}/bin"
-	path_add GOTOOLDIR "${PWD}/pkg/$( go env GOHOSTOS )_$( go env GOHOSTARCH )"
+	printf "\n"
+
+	# Set up instructions for the Go environment.
+	unset GOPATH
+	unset GOBIN
+	path_add GOPATH "${PWD}"
+	path_add GOBIN "${GOPATH}/bin"
+	path_add GOTOOLDIR "${GOPATH}/pkg/$( go env GOHOSTOS )_$( go env GOHOSTARCH )"
 	PATH_add "${GOBIN}"
+
+	# Create some local directories, if necessary
+	if [ -z "${TMPDIR}" ]; then
+		log_error "Environment variable \$TMPDIR is missing"
+		exit 1
+	fi
+	make_tmpfs "${GOBIN}"
+	make_tmpfs pkg
+	make_dir "${TMPDIR}/coverage"
+	make_dir "${TMPDIR}/profiling"
+	make_dir "${GOPATH}/src/${VANITY}/vendor"
+
+	# Export vendor/ directory.
+	# This is not necessary to run 'gb', but it's essential for other tools
+	# that need to directly call the go interpreter (such as 'make' or
+	# 'gometalinter') to function properly.
+	#
+	# NOTE: keep this export at the end so we don't pollute the GOPATH
+	#       with multiple pathnames, which are not supported by 'make_tmpfs'
+	#       and 'make_dir' used above.
+	local vendor="$( gb env GB_SRC_PATH | sed -e "s:/src::g" )"
+	vendor="${vendor/$GOPATH\:}"
+	export GOPATH="${GOPATH}:${vendor}"
 }
