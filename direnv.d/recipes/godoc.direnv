@@ -1,0 +1,4 @@
+# Check for godoc and extra utils
+require python ephemeral-port-reserve
+require systemd systemctl
+require golang godoc

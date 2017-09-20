@@ -1,0 +1,2 @@
+require golang go
+require golang gofmt
