@@ -1,0 +1,26 @@
+[Unit]
+Description=Go Documentation ( GOPATH="%I" )
+Wants=network.target
+
+AssertPathIsDirectory=%I
+AssertPathIsDirectory=%I/src
+AssertPathIsRead=%I/src
+
+[Service]
+Environment=GOPATH=%I
+
+# Set up file system namespace
+WorkingDirectory=%I
+ReadOnlyDirectories=%I
+
+# Set up service
+ExecStart=/bin/sh -c "port=$(/usr/bin/ephemeral-port-reserve); echo $port > %I/.godoc; /usr/bin/godoc -http=127.0.0.1:$port"
+ExecStop=/bin/rm -f %I/.godoc
+RestartSec=30
+Restart=always
+NoNewPrivileges=true
+DevicePolicy=closed
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

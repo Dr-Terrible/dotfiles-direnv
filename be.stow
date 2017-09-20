@@ -5,3 +5,7 @@
 direnv {
 	.direnvrc
 }
+
+systemd {
+	godoc@.service -> ~/.config/systemd/user/godoc@.service
+}
