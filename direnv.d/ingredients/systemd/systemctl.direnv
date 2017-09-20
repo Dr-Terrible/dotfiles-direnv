@@ -1,0 +1,8 @@
+# @FUNCTION: use_systemctl
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_systemctl() {
+	local version="$( systemctl --version | head -n 1 )"
+        printf "(${version})"
+}
