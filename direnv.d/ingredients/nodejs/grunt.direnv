@@ -9,6 +9,6 @@ use_grunt() {
 	# TODO: if there isn't a local version, exit with error
 	local grunt_local="$( echo ${version} | cut -d ' ' -f 4 )"
 
-	echo "   ---> CLI   ${grunt_cli} from ${nodejs_prefix}/bin/grunt"
-	echo "   ---> Local ${grunt_local}"
+	#printf "CLI   ${grunt_cli} from ${nodejs_prefix}/bin/grunt"
+	#printf "Local ${grunt_local}"
 }

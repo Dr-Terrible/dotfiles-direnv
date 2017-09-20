@@ -4,7 +4,7 @@
 #
 use_tmux() {
 	local version="$( tmux -V | cut -d ' ' -f 2 )"
-	echo "   ---> v${version}"
+	printf "v${version}"
 }
 
 # @FUNCTION: tmux_new
@@ -36,7 +36,7 @@ function tmux_new() {
 	# If the tmux session already exists, then return
 	tmux has-session -t "${session_name}" > /dev/null 2>&1
 	if [ $? == 0 ]; then
-		echo "   ---> existing session: ${fmt}"
+		printf "existing session: ${fmt}"
 		return
 	fi
 
@@ -51,7 +51,7 @@ function tmux_new() {
 	tmux new-session \
 		${options} \
 		-s "${session_name}" \
-		-F "   ---> create new session: ${fmt}"
+		-F "   >>>> create new session: ${fmt}"
 }
 
 # @FUNCTION: _validate_session_name
@@ -74,5 +74,5 @@ function _validate_session_name() {
 	fi
 
 	# Convert any dots (.) into hyphens characters
-	echo "${session_name//./-}"
+	printf "${session_name//./-}\n"
 }

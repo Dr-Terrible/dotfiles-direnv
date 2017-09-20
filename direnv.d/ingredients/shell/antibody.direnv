@@ -4,5 +4,5 @@
 #
 use_antibody() {
 	local version="$( antibody -v | cut -d ' ' -f 3 )"
-	echo "   ---> v${version}"
+	printf "v${version}"
 }

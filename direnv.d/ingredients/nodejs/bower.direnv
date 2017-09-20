@@ -3,6 +3,5 @@
 # @DESCRIPTION:
 #
 use_bower() {
-	echo "   ---> from ${nodejs_prefix}/bin/bower"
-	echo "   ---> v$( bower -v )"
+	printf "from ${nodejs_prefix}/bin/bower v$( bower -v )"
 }

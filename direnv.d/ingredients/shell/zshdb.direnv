@@ -4,5 +4,5 @@
 #
 use_zshdb() {
 	local version="$( zshdb -V | cut -d ' ' -f 3 )"
-	echo "   ---> v${version}"
+	printf "v${version}"
 }

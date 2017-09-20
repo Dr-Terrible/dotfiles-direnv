@@ -4,9 +4,9 @@
 #
 use_hub() {
 	local version="$( hub --version | tail -n +2 | cut -d ' ' -f 3 )"
-	echo "   ---> v${version}"
+	printf "v${version}"
 
 	# Setup instructions for hub command
 	alias git=hub
-	echo "   ---> aliasing hub as git"
+	printf " (aliasing hub as git)"
 }

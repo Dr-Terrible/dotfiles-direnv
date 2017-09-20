@@ -7,6 +7,6 @@ use_npm() {
 	nodejs_prefix="$( npm config get prefix )"
 	PATH_add "${nodejs_prefix}/bin"
 
-	echo "   ---> from ${nodejs_prefix}/bin/npm"
-	echo "   ---> v$( npm -v )"
+	printf "from ${nodejs_prefix}/bin/npm"
+	printf "v$( npm -v )"
 }

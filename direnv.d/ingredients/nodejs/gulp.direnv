@@ -9,6 +9,6 @@ use_gulp() {
 	# TODO: if there isn't a local version, exit with error
 	local gulp_local="$( echo ${version} | cut -d ' ' -f 8 )"
 
-	echo "   ---> CLI   v${gulp_cli} from ${nodejs_prefix}/bin/gulp"
-	echo "   ---> Local v${gulp_local} from ./node_modules/.bin/gulp"
+	printf "CLI   v${gulp_cli} from ${nodejs_prefix}/bin/gulp"
+	printf "Local v${gulp_local} from ./node_modules/.bin/gulp"
 }

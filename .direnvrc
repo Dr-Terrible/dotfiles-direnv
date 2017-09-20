@@ -167,7 +167,7 @@ function log_status_nonewline() {
 #
 #    use_go() {
 #      local version="$( go version | cut -d ' ' -f 3 )"
-#      echo "Go ${version//go/v}"
+#      printf "${version//go/v}\n"
 #    }
 #    usepkg go
 #    # output: go v1.9
@@ -191,7 +191,7 @@ function make_dir() {
 	for dir in $@; do
 		[[ -d ${dir} ]] && continue
 		mkdir -p ${dir}
-		echo "   >>>> created: ${dir//${PWD}\//}/"
+		printf "   >>>> created: ${dir//${PWD}\//}/ \n"
 	done
 }
 
@@ -223,7 +223,7 @@ function make_tmpfs() {
 		fi
 		local tempdir=$( mktemp --tmpdir --suffix="-${dir//${PWD}\//}" -d "${template}/${PROJECT}-XXXXXXXX" )
 		ln -sf "${tempdir}" "${dir//${PWD}\//}"
-		echo "   >>>> mounted ${dir//${PWD}\//} -> ${tempdir}"
+		printf "   >>>> mounted ${dir//${PWD}\//} -> ${tempdir} \n"
 	done
 }
 

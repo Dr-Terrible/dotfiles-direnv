@@ -4,8 +4,9 @@
 #
 use_go() {
 	local version="$( go version | cut -d ' ' -f 3 )"
-	echo "   ---> ${version//go/v}"
+	printf "${version//go/v}"
 
-	# Exports all the binaries from the Golang tool directory
-	PATH_add "$(go env GOTOOLDIR)"
+	# Exports all the binaries from the Go tool/ and bin/ directory
+	PATH_add "$( go env GOTOOLDIR )"
+	PATH_add "$( go env GOROOT )/bin"
 }

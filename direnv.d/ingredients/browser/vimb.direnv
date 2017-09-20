@@ -3,8 +3,8 @@
 # @DESCRIPTION:
 #
 use_vimb() {
-	local version="$( vimb -v | cut -d '/' -f 2 )"
-	echo "   ---> v${version}"
+	local version="$( vimb -v | head -n 1 | cut -d ' ' -f 3 )"
+	printf "v${version}"
 
 	# Setup instructions for vimb command
 	path_add BROWSER "$( which --skip-tilde vimb )"
