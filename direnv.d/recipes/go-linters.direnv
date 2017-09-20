@@ -1,10 +1,29 @@
-# Recipe for Golang linters
-
-require golang gofmt
-require golang vet
-require golang grind
+# Recipe for gometalinter
 require golang gometalinter
+require golang vet
+require golang deadcode
+require golang gocyclo
+require golang golint
+require golang varcheck
+require golang structcheck
+require golang aligncheck
+require golang errcheck
+require golang dupl
+require golang ineffassign
+require golang interfacer
+require golang unconvert
+require golang goconst
+require golang simple
+require golang staticcheck
+require golang gas
+
+# Recipe for gometalinter's optional linters
+require golang goimports
+require golang lll
+require golang misspell
+require golang unused
+
+# Recipe for Golang linters
+require golang grind
 require golang prdeps
 require golang depscheck
-require golang simple
-require golang unused

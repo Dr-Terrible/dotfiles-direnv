@@ -1,6 +1,6 @@
 # Recipe for Golang profiling tools
 
-require golang delve
+require golang dlv
 require golang godef
 require golang gom
 require golang go-torch
