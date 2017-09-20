@@ -9,33 +9,39 @@ use_git() {
 	# see https://github.com/keybase/keybase-issues/issues/1712
 	[ -z "$GPG_TTY" ] && export GPG_TTY=$(tty)
 
-	if [ -d "${GOPATH}/.git" ]; then
-		log_error "warning: git repository inside $GOPATH instead of $GOPATH/src/$VANITY"
-		return
+	if [ -d "${PWD}/.git" ]; then
+		log_error "warning: git repository inside $PWD instead of $PWD/src/$VANITY"
+		return 1
 	fi
 
+	# Make sure TMPDIR has a fallback value and is a writable directory.
+	TMPDIR="${TMPDIR:-./tmp}"
+	if [[ ! -w ${TMPDIR} ]] ; then
+		log_error "\$TMPDIR is not writable: ${TMPDIR}"
+		return 1
+    fi
 
 	# Execute git commands under lock to avoid races.
 	(
 		flock 9 || return -1
 
 		# Extract the absolute vanity path
-        local vanity_path="$GOPATH/src/$VANITY"
+        local vanity_path="$PWD/src/$VANITY"
 
 		pushd "${vanity_path}" > /dev/null
 
-			# NOTE: we re-run 'git init' even if the repository is already created
-			#       to pick up newly added templates and to update stuff when a new
-			#       version of git is used.
+			# NOTE: we re-run 'git init' even if the repository has already been
+			#       created so we can pick up newly added templates and update
+			#       stuff provided by new versions of git.
 			printf "   >>>> "
 			git init
 
 			# Clean up the Git repository, if necessary
 			git gc -q --auto
-			printf "   >>>> done housekeeping tasks within the current Git repository\n"
+			printf "   >>>> Done housekeeping within Git repository  ${vanity_path}/.git/"
 
 		popd > /dev/null
 
 
-	) 9>./tmp/git-init.lock
+	) 9>${TMPDIR}/git-init-$( echo $VANITY | tr / -).lock
 }
