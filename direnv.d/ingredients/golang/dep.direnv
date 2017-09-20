@@ -1,0 +1,35 @@
+# @FUNCTION: use_dep
+# @INTERNAL
+#
+# @DESCRIPTION:
+# This helper function sets up a Go workspace suitable for
+# a project that uses 'dep' as a vendoring tool.
+#
+# The resulting project structure will be as follow:
+# .
+# ├── bin/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-bin
+# ├── tmp/ -> /$TMPDIR/envrc-$USER/$PROJECT-XXXXXXXX-tmp
+# └── src/
+#     └── $VANITY/          <--- *your source code goes there*
+#         ├── vendor/
+#         ├── Gopkg.lock
+#         ├── Gopkg.toml
+#         └── vendor.lock
+use_dep() {
+	printf "\n"
+
+	# Set up instructions for an environment suitable
+	# for a Go project that uses dep tool.
+	unset GOPATH
+	unset GOBIN
+	path_add GOPATH "${PWD}"
+	path_add GOBIN "${GOPATH}/bin"
+	PATH_add "${GOBIN}"
+
+	# Create some local directories, if necessary
+	make_tmpfs "${GOBIN}"
+	make_tmpfs "${GOPATH}/tmp"
+	make_dir "${GOPATH}/tmp/coverage"
+	make_dir "${GOPATH}/tmp/profiling"
+	make_dir "${GOPATH}/src/${VANITY}/vendor"
+}
