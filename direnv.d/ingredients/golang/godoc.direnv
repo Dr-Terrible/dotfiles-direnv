@@ -33,8 +33,6 @@ use_godoc() {
 	printf " 127.0.0.1:$( get_port )\n"
 }
 
-function use_systemctl() { :; }
-
 function get_port() {
 	[ ! -e "${GOPATH%%:*}/.godoc" ] && return
 	echo "$( cat ${GOPATH%%:*}/.godoc )"

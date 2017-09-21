@@ -13,8 +13,8 @@ DIRENVD_DIR=""
 #
 # @DESCRIPTION:
 # This function expands the supplied <name> to the environment variable PROJECT.
-# If <name> is a Golang import path, then <name> is automatically expanded to
-# the environment variable VANITY which will hold the vanity import path of the
+# If <name> is a Go's import path, then <name> is automatically expanded to the
+# environment variable VANITY, which will hold the vanity import path of the
 # project.
 #
 # Example:
@@ -141,7 +141,7 @@ function require() {
 
 # Usage: log_status_nonewline [<message> ...]
 #
-# Logs a status message whithout the trailing newline char.
+# Logs a status message without the trailing newline char.
 # Acts like echo, but wraps output in the standard direnv log format
 # (controlled by $DIRENV_LOG_FORMAT), and directs it to stderr
 # rather than stdout.
@@ -204,24 +204,37 @@ function make_dir() {
 function make_tmpfs() {
 	for dir in $@; do
 		[[ -d ${dir} ]] && continue
-		# TODO: find a way to execute the mount without requiring root privilegies.
+		# TODO: find a way to execute the mount without requiring root privileges.
 		#       possibly, try to use systemd services for mounting points.
 		#       for now we use symlinks to /tmp
 		#mount -t tmpfs none ${dir} -o 'rw,nosuid,nodev,noexec,noauto,nouser,owner,lazytime,async'
 
+		# Make sure $PROJECT exists
+		if [ -z "${PROJECT}" ]; then
+			log_error "Environment variable \$PROJECT is missing"
+			return -1
+		fi
+
+		# Make sure mktemp is available.
 		if ! command -pv mktemp >/dev/null ; then
 			log_error "Command 'mktemp' not found"
 			return -1
 		fi
 
-		local template="envrc-${USER}"
-		mkdir -p "${TMPDIR-/tmp}/${template}"
-
-		if [ -z "${PROJECT}" ]; then
-			log_error "Environment variable \$PROJECT is missing"
+		# Make sure /tmp is writeable.
+		# TODO: /tmp is not cross-platform, and TMPDIR is a bashisms (overwritten
+		#       by os-project); we should rely on something else.
+		if [ ! -w "/tmp" ]; then
+			log_error "/tmp is not writeable"
 			return -1
 		fi
-		local tempdir=$( mktemp --tmpdir --suffix="-${dir//${PWD}\//}" -d "${template}/${PROJECT}-XXXXXXXX" )
+
+		# Create the directory which will contain the template for mktemp.
+		local template="envrc-${USER}"
+		mkdir -p "/tmp/${template}"
+
+		# Create the temporary directory and symlink it into the local project.
+		local tempdir=$( mktemp --suffix="-${dir//${PWD}\//}" -d "/tmp/${template}/${PROJECT}-XXXXXXXX" )
 		ln -sf "${tempdir}" "${dir//${PWD}\//}"
 		printf "   >>>> mounted ${dir//${PWD}\//} -> ${tempdir} \n"
 	done

@@ -14,10 +14,10 @@ use_git() {
 		return 1
 	fi
 
-	# Make sure TMPDIR has a fallback value and is a writable directory.
+	# Make sure TMPDIR has a fall-back value and is a writeable directory.
 	TMPDIR="${TMPDIR:-./tmp}"
 	if [[ ! -w ${TMPDIR} ]] ; then
-		log_error "\$TMPDIR is not writable: ${TMPDIR}"
+		log_error "\$TMPDIR is not writeable: ${TMPDIR}"
 		return 1
     fi
 
