@@ -13,8 +13,10 @@
 #     └── $VANITY/          <--- *your source code goes there*
 #         ├── vendor/
 #         └── manifest
+#
 use_gvt() {
 	printf "\n"
+	export GOVENDORINGTOOL="gvt"
 
 	# Set up instructions for the Go environment.
 	unset GOPATH

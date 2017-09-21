@@ -16,6 +16,7 @@
 #
 use_gb() {
 	printf "\n"
+	export GOVENDORINGTOOL="gb"
 
 	# Set up instructions for the Go environment.
 	unset GOPATH

@@ -13,10 +13,11 @@
 #     └── $VANITY/          <--- *your source code goes there*
 #         ├── vendor/
 #         ├── Gopkg.lock
-#         ├── Gopkg.toml
-#         └── vendor.lock
+#         └── Gopkg.toml
+#
 use_dep() {
 	printf "\n"
+	export GOVENDORINGTOOL="dep"
 
 	# Set up instructions for the Go environment.
 	unset GOPATH
