@@ -44,10 +44,10 @@ DIRENVD_DIR=""
 #    $ env | grep VANITY
 #    VANITY=github.com/wonderboy/darkstar
 function project() {
-	local name="${1:-empty}"
+	local name="${1:-isempty}"
 
 	# Exit if the project name is empty
-	if [[ "empty" == ${name##*/} ]]; then
+	if [[ "isempty" == ${name##*/} ]]; then
 		log_error "You must supply a valid project name when invoking project()!"
 		exit 1
 	fi
@@ -56,7 +56,7 @@ function project() {
 	export PROJECT="${name##*/}"
 
 	# Export VANITY (only if different from PROJECT)
-	[[ ${PROJECT} == ${name} ]] && return
+	#[[ ${PROJECT} == ${name} ]] && return
 	export VANITY="${name}"
 }
 

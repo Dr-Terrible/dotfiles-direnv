@@ -3,7 +3,8 @@
 # user manual about be.stow syntax
 
 direnv {
-	.direnvrc
+	direnvrc -> .direnvrc
+	envrc -> .envrc
 }
 
 systemd {
