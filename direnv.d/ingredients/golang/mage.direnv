@@ -1,0 +1,18 @@
+# @FUNCTION: use_mage
+# @INTERNAL
+#
+# @DESCRIPTION:
+# This helper function sets up an environment suitable for
+# a project that uses 'make' as a make/rake tool.
+use_mage() {
+	printf "\n"
+
+	# Create local cache directory, if necessary
+        if [ -z "${TMPDIR}" ]; then
+                log_error "Environment variable \$TMPDIR is missing"
+                exit 1
+        fi
+	local cache_dir="${TMPDIR}/mage"
+	make_dir "${cache_dir}"
+	path_add MAGEFILE_CACHE ${cache_dir}
+}
