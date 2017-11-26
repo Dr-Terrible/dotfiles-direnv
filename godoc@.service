@@ -14,7 +14,7 @@ WorkingDirectory=%I
 ReadOnlyDirectories=%I
 
 # Set up service
-ExecStart=/bin/sh -c "port=$(/usr/bin/ephemeral-port-reserve); echo $port > %I/.godoc; /usr/bin/godoc -http=127.0.0.1:$port"
+ExecStart=/bin/sh -c "port=$(/usr/bin/ephemeral-port-reserve); echo $port > %I/.godoc; ionice -c 3 -t /usr/bin/godoc -http=127.0.0.1:$port"
 ExecStop=/bin/rm -f %I/.godoc
 RestartSec=30
 Restart=always
