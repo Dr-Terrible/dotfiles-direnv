@@ -1,0 +1,12 @@
+# @FUNCTION: use_google-chrome-stable
+# @INTERNAL
+# @DESCRIPTION:
+#
+# The web browser from Google.
+use_google-chrome-stable() {
+	local version="$( google-chrome-stable --version | cut -d ' ' -f 3 )"
+	printf "v${version}"
+
+	# Setup instructions for Google command
+	export BROWSER="google-chrome-stable"
+}
