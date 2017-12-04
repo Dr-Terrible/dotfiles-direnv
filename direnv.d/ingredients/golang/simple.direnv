@@ -1,5 +1,0 @@
-# @FUNCTION: use_simple
-# @INTERNAL
-# @DESCRIPTION:
-#
-use_simple() { :; }

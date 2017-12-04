@@ -13,7 +13,7 @@ require golang ineffassign
 require golang interfacer
 require golang unconvert
 require golang goconst
-require golang simple
+require golang gosimple
 require golang staticcheck
 require golang gas
 
