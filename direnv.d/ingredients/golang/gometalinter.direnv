@@ -2,4 +2,7 @@
 # @INTERNAL
 # @DESCRIPTION:
 #
-use_gometalinter() { :; }
+use_gometalinter() {
+	local version="$( gometalinter --version )"
+	printf "v${version}"
+}
