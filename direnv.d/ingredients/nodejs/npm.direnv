@@ -3,10 +3,15 @@
 # @DESCRIPTION:
 #
 use_npm() {
-	# TODO: npm config get prefix must not be empty
-	nodejs_prefix="$( npm config get prefix )"
-	PATH_add "${nodejs_prefix}/bin"
+	local nodejs_prefix="$( npm config get prefix )"
+	local npm="${nodejs_prefix}/bin/npm"
 
-	printf "from ${nodejs_prefix}/bin/npm"
-	printf "v$( npm -v )"
+	# npm prefix must not be empty
+	if [ -z "${nodejs_prefix}" ]; then
+		log_error "npm prefix is empty! Aborting."
+		exit 1
+	fi
+
+	printf "from ${npm}"
+	printf " v$( ${npm} -v )"
 }

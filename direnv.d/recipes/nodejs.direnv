@@ -1,1 +1,2 @@
-require nodejs npm     # npm install -g --verbose npm
+require nodejs npm
+require nodejs yarn

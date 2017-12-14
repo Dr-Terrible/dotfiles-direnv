@@ -1,0 +1,22 @@
+# @FUNCTION: use_yarn
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_yarn() {
+	printf " v$( yarn -v )\n"
+
+	# Append global bin/ directory for node packages installed by yarn
+	local yarn_global_bin="$( yarn global bin )"
+	PATH_add "${yarn_global_bin}"
+
+	# Append local bin/ directory for node packages installed by yarn
+	# NOTE: local bin/ has precedence over other yarn executable paths,
+	#       so it must be declared as last.
+	local yarn_local_bin="$( yarn bin )"
+	PATH_add "${yarn_local_bin}"
+
+	# Print summary
+	printf "    >>>  local bin: ${yarn_local_bin}\n"
+	printf "    >>> global bin: ${yarn_global_bin}\n"
+	printf "    >>>      cache: $( yarn cache dir )\n"
+}

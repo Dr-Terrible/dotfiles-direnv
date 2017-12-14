@@ -3,5 +3,6 @@
 # @DESCRIPTION:
 #
 use_bower() {
-	printf "from ${nodejs_prefix}/bin/bower v$( bower -v )"
+	printf "from ${nodejs_prefix}/bin/bower v$( bower -v )\n"
+	log_error "WARNING: bower is deprecated in favour of yarn! Migrate your set up."
 }
