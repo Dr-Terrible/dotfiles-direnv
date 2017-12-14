@@ -6,7 +6,25 @@ use_go() {
 	local version="$( go version | cut -d ' ' -f 3 )"
 	printf "${version//go/v}"
 
-	# Exports all the binaries from the Go tool/ and bin/ directory
+
+
+	# Export the current working directory as GOPATH.
+	unset GOPATH
+	path_add GOPATH "${PWD}"
+
+	# Create the ./bin directory, if necessary.
+	if [ -z "${TMPDIR}" ]; then
+		log_error "Environment variable \$TMPDIR is missing"
+		exit 1
+	fi
+	make_tmpfs "${GOBIN}"
+
+	# Export the ./bin directory as GOBIN
+	unset GOBIN
+	path_add GOBIN "${GOPATH}/bin"
+
+	# Export all the binaries from the local ./bin and the Go tools directories.
 	PATH_add "$( go env GOTOOLDIR )"
 	PATH_add "$( go env GOROOT )/bin"
+	PATH_add "${GOBIN}"
 }
