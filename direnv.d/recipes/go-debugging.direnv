@@ -1,0 +1,9 @@
+# Recipe for Golang code debugging tools
+
+require golang dlv
+require golang godef
+require golang gom
+require golang go-torch
+require golang go-fuzz
+require golang gcvis
+require golang structlayout

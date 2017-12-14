@@ -1,4 +1,5 @@
-# Recipe for Golang profiling tools
+# Recipe for Golang code profiling tools
+# WIP
 
 # Create some local directories, if necessary.
 if [ -z "${TMPDIR}" ]; then
@@ -6,11 +7,3 @@ if [ -z "${TMPDIR}" ]; then
 	exit 1
 fi
 make_dir "${TMPDIR}/profiling"
-
-require golang dlv
-require golang godef
-require golang gom
-require golang go-torch
-require golang go-fuzz
-require golang gcvis
-require golang structlayout

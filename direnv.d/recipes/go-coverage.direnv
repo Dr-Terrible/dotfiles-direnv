@@ -1,4 +1,4 @@
-# Recipe for Golang coverage tools
+# Recipe for Golang code coverage tools
 
 # Create some local directories, if necessary.
 if [ -z "${TMPDIR}" ]; then
