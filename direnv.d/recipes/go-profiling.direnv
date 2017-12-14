@@ -1,5 +1,12 @@
 # Recipe for Golang profiling tools
 
+# Create some local directories, if necessary.
+if [ -z "${TMPDIR}" ]; then
+	log_error "Environment variable \$TMPDIR is missing"
+	exit 1
+fi
+make_dir "${TMPDIR}/profiling"
+
 require golang dlv
 require golang godef
 require golang gom

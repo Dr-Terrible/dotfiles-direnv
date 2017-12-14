@@ -18,12 +18,6 @@ use_gvt() {
 	printf "\n"
 	export GOVENDORINGTOOL="gvt"
 
-	# Create some local directories, if necessary.
-	if [ -z "${TMPDIR}" ]; then
-		log_error "Environment variable \$TMPDIR is missing"
-		exit 1
-	fi
-	make_dir "${TMPDIR}/coverage"
-	make_dir "${TMPDIR}/profiling"
+	# Create local vendor directory, if necessary.
 	make_dir "${GOPATH}/src/${VANITY}/vendor"
 }
