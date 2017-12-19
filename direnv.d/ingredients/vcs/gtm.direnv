@@ -1,0 +1,7 @@
+# @FUNCTION: use_gtm
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_gtm() {
+	printf "$( gtm --version )"
+}
