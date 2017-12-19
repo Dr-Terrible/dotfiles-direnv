@@ -1,0 +1,6 @@
+# @FUNCTION: use_go-pprof
+# @INTERNAL
+# @DESCRIPTION:
+#
+# pprof is a tool for visualization and analysis of profiling data.
+use_go-pprof() { :; }

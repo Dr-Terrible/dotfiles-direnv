@@ -1,0 +1,8 @@
+# @FUNCTION: use_dot
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_dot() {
+	local version="$( dot -V )"
+	printf "${version}"
+}

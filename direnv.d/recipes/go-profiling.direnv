@@ -1,5 +1,21 @@
-# Recipe for Golang code profiling tools
-# WIP
+# Recipe for profiling tools for the Go language.
+#
+# Profiling is useful for identifying expensive or frequently called sections
+# of code.
+#
+# The Go runtime provides profiling data in the format expected by the pprof
+# visualization tool. The profiling data can be collected during testing via go
+# test or endpoints made available from the net/http/pprof package. Users need
+# to collect the profiling data and use pprof tools to filter and visualize
+# the top code paths.
+#
+# For more info, see golang.org/doc/diagnostics.html
+
+require utils dot
+require golang go-pprof
+require golang perf_to_profile  # part of dev-util/perf-data-converter
+require golang go-torch
+require golang gom
 
 # Create some local directories, if necessary.
 if [ -z "${TMPDIR}" ]; then
