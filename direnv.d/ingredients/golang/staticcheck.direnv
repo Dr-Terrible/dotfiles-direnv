@@ -2,4 +2,8 @@
 # @INTERNAL
 # @DESCRIPTION:
 #
-use_staticcheck() { :; }
+# This tool is part of dev-util/go-tools
+use_staticcheck() {
+	local version="$( staticcheck -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

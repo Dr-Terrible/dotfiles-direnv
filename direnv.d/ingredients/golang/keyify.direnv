@@ -1,0 +1,9 @@
+# @FUNCTION: use_keyify
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This tool is part of dev-util/go-tools
+use_keyify() {
+	local version="$( keyify -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

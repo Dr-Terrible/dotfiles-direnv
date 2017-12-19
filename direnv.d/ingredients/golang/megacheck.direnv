@@ -1,0 +1,9 @@
+# @FUNCTION: use_megacheck
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This tool is part of dev-util/go-tools
+use_megacheck() {
+	local version="$( megacheck -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

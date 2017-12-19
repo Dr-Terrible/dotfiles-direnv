@@ -1,0 +1,9 @@
+# @FUNCTION: use_errcheck-ng
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This tool is part of dev-util/go-tools
+use_errcheck-ng() {
+	local version="$( errcheck-ng -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

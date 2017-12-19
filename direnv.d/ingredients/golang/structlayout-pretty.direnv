@@ -1,0 +1,9 @@
+# @FUNCTION: use_structlayout-pretty
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This tool is part of dev-util/go-tools
+use_structlayout-pretty() {
+	local version="$( structlayout-pretty -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

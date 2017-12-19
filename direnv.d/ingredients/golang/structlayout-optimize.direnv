@@ -1,0 +1,9 @@
+# @FUNCTION: use_structlayout-optimize
+# @INTERNAL
+# @DESCRIPTION:
+#
+# This tool is part of dev-util/go-tools
+use_structlayout-optimize() {
+	local version="$( structlayout-optimize -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

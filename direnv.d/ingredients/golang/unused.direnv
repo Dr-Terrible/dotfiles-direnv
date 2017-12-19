@@ -2,4 +2,8 @@
 # @INTERNAL
 # @DESCRIPTION:
 #
-use_unused() { :; }
+# This tool is part of dev-util/go-tools
+use_unused() {
+	local version="$( unused -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}

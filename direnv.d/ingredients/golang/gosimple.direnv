@@ -2,4 +2,8 @@
 # @INTERNAL
 # @DESCRIPTION:
 #
-use_gosimple() { :; }
+# This tool is part of dev-util/go-tools
+use_gosimple() {
+	local version="$( gosimple -version | cut -d ' ' -f 2 )"
+	printf "v${version}"
+}
