@@ -85,8 +85,9 @@ function concoct() {
 
 	# Load the required recipe from direnv.d directory and guard it with
 	# a lock to avoid conflicting executions of the same commands.
+	shift
 	log_status "checking ${cmd}"
-	_include "${recipe}"
+	_include "${recipe}" "$@"
 }
 
 
@@ -280,7 +281,8 @@ function _include() {
 	exec 200>"${lock_dir}"/${lock_file}.lock
 	flock -w 60 -x 200
 
-		. "${file}"
+		shift
+		. "${file}" "$@"
 
 	flock -u 200 # unlocking
 }
