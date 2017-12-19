@@ -1,0 +1,20 @@
+# Recipe for tracing tools for the Go language.
+#
+# Tracing is a way to instrument code to analyse latency throughout the
+# life-cycle of a chain of calls.
+#
+# Go provides golang.org/x/net/trace package as a minimal tracing back-end per
+# Go node and provides a minimal instrumentation library with a simple
+# dashboard. Go also provides an execution tracer to trace the runtime events
+# within an interval.
+#
+# For more info, see golang.org/doc/diagnostics.html
+
+require golang gcvis
+
+# Create some local directories, if necessary.
+if [ -z "${TMPDIR}" ]; then
+	log_error "Environment variable \$TMPDIR is missing"
+	exit 1
+fi
+make_dir "${TMPDIR}/tracing"
