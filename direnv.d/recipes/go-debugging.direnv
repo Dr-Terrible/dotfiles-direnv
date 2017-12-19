@@ -1,9 +1,11 @@
-# Recipe for Golang code debugging tools
+# Recipe for debugging tools for the Go language.
+#
+# Debugging is the process of identifying why a program misbehaves.
+# Debuggers allow us to understand a program’s execution flow and current
+# state. There are several styles of debugging; this section will only focus
+# on attaching a debugger to a program and core dump debugging.
+#
+# For more info, see golang.org/doc/diagnostics.html
 
 require golang dlv
 require golang godef
-require golang gom
-require golang go-torch
-require golang go-fuzz
-require golang gcvis
-require golang structlayout
