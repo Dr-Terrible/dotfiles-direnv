@@ -1,0 +1,3 @@
+# Recipe for fuzzing tools for the Go language.
+
+require golang go-fuzz
