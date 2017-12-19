@@ -1,1 +1,23 @@
 require golang mage
+
+# Create local cache directory, if necessary.
+if [ -z "${TMPDIR}" ]; then
+	log_error "Environment variable \$TMPDIR is missing"
+	exit 1
+fi
+local cache_dir="${TMPDIR}/mage"
+make_dir "${cache_dir}"
+path_add MAGEFILE_CACHE ${cache_dir}
+
+# Import the supplied shared GOPATH, if any.
+local SHARED_GOPATH="$2"
+[ -z "${SHARED_GOPATH}" ] && return
+if [ ! -d "${SHARED_GOPATH}" ]; then
+	log_error "Supplied shared GOPATH '${SHARED_GOPATH}' is not a valid directory"
+	exit 1
+fi
+
+SHARED_GOPATH="$( expand_path ${SHARED_GOPATH} )"
+export GOPATH="$GOPATH:${SHARED_GOPATH}"
+
+printf "   >>>> import shared GOPATH: ${SHARED_GOPATH}\n"
