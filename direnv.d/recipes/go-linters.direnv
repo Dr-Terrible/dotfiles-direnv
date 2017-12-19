@@ -13,17 +13,24 @@ require golang ineffassign
 require golang interfacer
 require golang unconvert
 require golang goconst
-require golang gosimple
-require golang staticcheck
 require golang gas
-
-# Recipe for gometalinter's optional linters
 require golang goimports
 require golang lll
 require golang misspell
+
+# Linters from dev-util/go-tools
+require golang errcheck-ng
+require golang gosimple
+require golang keyify
+require golang megacheck
+require golang rdeps
+require golang staticcheck
+require golang structlayout
+require golang structlayout-optimize
+require golang structlayout-pretty
 require golang unused
 
-# Recipe for Golang linters
+# Extra linters
 require golang grind
 require golang prdeps
 require golang depscheck
