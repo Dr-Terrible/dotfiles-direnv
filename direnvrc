@@ -10,7 +10,7 @@ CUPBOARD=""
 # This is the directory where all the temporary locks are stored.
 # By default, it is an empty string.
 # If you want to use a different path, then override the default value with
-# and absolute path name pointing to a directory writeable by $USER.
+# an absolute path name pointing to a directory writeable by $USER.
 LOCKER_ROOM=""
 
 # @FUNCTION: project
@@ -18,9 +18,6 @@ LOCKER_ROOM=""
 #
 # @DESCRIPTION:
 # This function expands the supplied <name> to the environment variable PROJECT.
-# If <name> is a Go's import path, then <name> is automatically expanded to the
-# environment variable VANITY, which will hold the vanity import path of the
-# project.
 #
 # Example:
 #    $ cat ~/my/project/.envrc
@@ -33,21 +30,6 @@ LOCKER_ROOM=""
 #
 #    $ env | grep PROJECT
 #    PROJECT=darkstar
-#
-# Example (Golang import path)
-#    $ cat ~/my/project/.envrc
-#    project github.com/wonderboy/darkstar
-#
-#    $ direnv allow ~/my/project/.envrc
-#    direnv: loading ~/.direnvrc
-#    direnv: loading .envrc
-#    direnv: export +PROJECT +VANITY
-#
-#    $ env | grep PROJECT
-#    PROJECT=darkstar
-#
-#    $ env | grep VANITY
-#    VANITY=github.com/wonderboy/darkstar
 function project() {
 	local name="${1:-isempty}"
 
@@ -58,13 +40,8 @@ function project() {
 	fi
 
 	# Export PROJECT
-	export PROJECT="${name##*/}"
-
-	# Export VANITY (only if different from PROJECT)
-	#[[ ${PROJECT} == ${name} ]] && return
-	export VANITY="${name}"
-
-	log_status "setting project: ${name}"
+	export PROJECT="${name}"
+	log_status "setting project: ${name##*/}"
 }
 
 
@@ -236,7 +213,7 @@ function make_tmpfs() {
 		fi
 
 		# Make sure /tmp is writeable.
-		# TODO: /tmp is not cross-platform, and TMPDIR is a bashisms (overwritten
+		# TODO: /tmp is not cross-platform, and TMPDIR is a bash-isms (overwritten
 		#       by os-project); we should rely on something else.
 		if [ ! -w "/tmp" ]; then
 			log_error "/tmp is not writeable"

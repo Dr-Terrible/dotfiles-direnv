@@ -1,6 +1,35 @@
 require golang go
 require golang gofmt
 
+# If PROJECT is a Go's import path, then it is automatically expanded to the
+# environment variable VANITY, which will hold the vanity import path of the
+# project.
+#
+# Example (valid Golang import path)
+#    $ cat ~/my/project/.envrc
+#    project github.com/wonderboy/darkstar
+#
+#    $ direnv allow ~/my/project/.envrc
+#    direnv: loading ~/.direnvrc
+#    direnv: loading .envrc
+#    direnv: export +PROJECT +VANITY
+#
+#    $ env | grep PROJECT
+#    PROJECT=darkstar
+#
+#    $ env | grep VANITY
+#    VANITY=github.com/wonderboy/darkstar
+#
+# NOTE: Don't use path_addi() for setting VANITY and PROJECT,
+#       or the values will be expanded into absolute paths.
+export VANITY="${PROJECT}"
+export PROJECT="${PROJECT##*/}"
+
+if [[ "${VANITY}" == "${PROJECT}" ]]; then
+	log_error "The supplied $PROJECT is not a Go's vanity import path!"
+	exit 1
+fi
+
 # Export the current working directory as GOPATH.
 unset GOPATH
 path_add GOPATH "${PWD}"
@@ -15,3 +44,11 @@ path_add GOBIN "${GOPATH}/bin"
 PATH_add "$( go env GOTOOLDIR )"
 PATH_add "$( go env GOROOT )/bin"
 PATH_add "${GOBIN}"
+
+# Create the ./tmp directory, if necessary,
+# and export it as $TMPDIR
+local tmp="${PWD}/tmp"
+make_tmpfs "${tmp}"
+unset TMPDIR
+path_add TMPDIR "${tmp}"
+unset tmp
