@@ -5,15 +5,10 @@ require golang gofmt
 unset GOPATH
 path_add GOPATH "${PWD}"
 
-# Create the ./bin directory, if necessary.
-if [ -z "${TMPDIR}" ]; then
-	log_error "Environment variable \$TMPDIR is missing"
-	exit 1
-fi
-make_tmpfs "${GOBIN}"
-
-# Export the ./bin directory as GOBIN
+# Create the ./bin directory, if necessary,
+# and export it as GOBIN.
 unset GOBIN
+make_tmpfs "${GOPATH}/bin"
 path_add GOBIN "${GOPATH}/bin"
 
 # Export all the binaries from the local ./bin and the Go tools directories.

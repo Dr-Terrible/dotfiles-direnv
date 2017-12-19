@@ -1,0 +1,4 @@
+# Make $TMPDIR pointing to a local tmp/ directory
+path="${PWD}/tmp"
+make_tmpfs "${path}"
+export TMPDIR="${path}"

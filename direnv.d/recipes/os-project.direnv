@@ -2,8 +2,3 @@
 
 require utils flint
 require golang anderson
-
-# All the projects must have a $TMPDIR pointing to a local directory
-path="${PWD}/tmp"
-make_tmpfs "${path}"
-path_add TMPDIR "${path}"
