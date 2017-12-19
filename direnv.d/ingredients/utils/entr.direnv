@@ -1,0 +1,8 @@
+# @FUNCTION: use_entr
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_entr() {
+	local version="$( entr version )"
+	printf "v${version}"
+}

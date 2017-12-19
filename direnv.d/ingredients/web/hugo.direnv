@@ -1,0 +1,7 @@
+# @FUNCTION: use_hugo
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_hugo() {
+	printf "$( hugo version | cut -d ' ' -f 5 )"
+}

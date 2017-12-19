@@ -1,0 +1,8 @@
+# @FUNCTION: use_watchman
+# @INTERNAL
+# @DESCRIPTION:
+#
+use_watchman() {
+	local version="$( watchman version | tail -n +2 | head -n 1 | cut -d ':' -f 2 | sed -e "s:\"::g" )"
+	printf "v$( echo ${version} )"
+}
