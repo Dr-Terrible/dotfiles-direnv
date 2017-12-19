@@ -5,8 +5,13 @@ set -eo pipefail
 # By default, it is an empty string.
 # If you want to use a different path, then override the default value with
 # and absolute path name pointing to a direnv.d/ directory
-DIRENVD_DIR=""
+CUPBOARD=""
 
+# This is the directory where all the temporary locks are stored.
+# By default, it is an empty string.
+# If you want to use a different path, then override the default value with
+# and absolute path name pointing to a directory writeable by $USER.
+LOCKER_ROOM=""
 
 # @FUNCTION: project
 # @USAGE: project <name>
@@ -58,6 +63,8 @@ function project() {
 	# Export VANITY (only if different from PROJECT)
 	#[[ ${PROJECT} == ${name} ]] && return
 	export VANITY="${name}"
+
+	log_status "setting project: ${name}"
 }
 
 
@@ -69,7 +76,7 @@ function project() {
 function concoct() {
 
 	# Determine the location of the direnv.d directory
-	if [[ -z ${DIRENVD_DIR} ]]; then
+	if [[ -z $( echo ${CUPBOARD} ) ]]; then
 		local direnvrc="$HOME/.direnvrc"
 		if [[ ! -L ${direnvrc} ]]; then
 			log_error "${direnvrc} is not a symbolic link!"
@@ -79,8 +86,8 @@ function concoct() {
 			exit 1
 		fi
 
-		DIRENVD_DIR="$( readlink ${direnvrc} )"
-		DIRENVD_DIR="$( dirname ${DIRENVD_DIR} )/direnv.d"
+		CUPBOARD="$( readlink ${direnvrc} )"
+		CUPBOARD="$( dirname ${CUPBOARD} )/direnv.d"
 	fi
 
 	local cmd="${1}"
@@ -91,17 +98,20 @@ function concoct() {
 		exit 1
 	fi
 
-	local recipe="${DIRENVD_DIR}/recipes/${1}.direnv"
+	local recipe="${CUPBOARD}/recipes/${1}.direnv"
 
-	# Load the required recipe from direnv.d directory
+	# If the recipe isn't readable, then exit
 	if [[ ! -r ${recipe} ]]; then
-		log_error "Unable to find recipe: ${cmd}!"
+		log_error "Unable to read recipe: ${cmd}!"
 		exit 1
 	fi
 
+	# Load the required recipe from direnv.d directory and guard it with
+	# a lock to avoid conflicting executions of the same commands.
 	log_status "checking ${cmd}"
-	source ${recipe}
+	_include "${recipe}"
 }
+
 
 # @FUNCTION: require
 # @USAGE: require <food container> <ingredient>
@@ -117,15 +127,16 @@ function concoct() {
 function require() {
 	local container="${1:-empty}"
 	local cmd="${2:-empty}"
-	local ingredient="${DIRENVD_DIR}/ingredients/${container}/${cmd}.direnv"
+	local ingredient="${CUPBOARD}/ingredients/${container}/${cmd}.direnv"
 
-	# Load the required ingredient from direnv.d directory
+	# Load the required ingredient from direnv.d directory, and guard it
+	# with a lock to avoid conflicting executions of the same commands.
 	if [[ ! -r ${ingredient} ]]; then
 		log_error "Unable to find ingredient: ${cmd}!"
 		log_error "No such file or directory: ${ingredient}"
 		exit 1
 	fi
-	source "${ingredient}"
+	_include "${ingredient}"
 
 	# Detect the presence of the specified command
 	if ! has ${cmd}; then
@@ -138,6 +149,7 @@ function require() {
 	local DIRENV_LOG_FORMAT="   ---> %s"
 	usepkg ${cmd} "$@"
 }
+
 
 # Usage: log_status_nonewline [<message> ...]
 #
@@ -158,9 +170,10 @@ function log_status_nonewline() {
 	fi
 }
 
+
 # Usage: usepkg <program_name> [<version>]
 #
-# A semantic command dispatch intended for loading external dependencies into
+# A semantic command dispatcher intended for loading external dependencies into
 # the environment.
 #
 # Example:
@@ -182,7 +195,7 @@ function usepkg() {
 
 
 # @FUNCTION:
-# @USAGE: make_dir <directory> ... <directotyN>
+# @USAGE: make_dir <directory> ... <directoryN>
 #
 # @DESCRIPTION:
 # This helper function creates the given directories,
@@ -194,6 +207,7 @@ function make_dir() {
 		printf "   >>>> created: ${dir//${PWD}\//}/ \n"
 	done
 }
+
 
 # @FUNCTION:
 # @USAGE: make_tmpfs <directory>
@@ -210,7 +224,7 @@ function make_tmpfs() {
 		#mount -t tmpfs none ${dir} -o 'rw,nosuid,nodev,noexec,noauto,nouser,owner,lazytime,async'
 
 		# Make sure $PROJECT exists
-		if [ -z "${PROJECT}" ]; then
+		if [ -z $( echo "${PROJECT}" ) ]; then
 			log_error "Environment variable \$PROJECT is missing"
 			return -1
 		fi
@@ -241,14 +255,55 @@ function make_tmpfs() {
 }
 
 
-# @FUNCTION: include
+# @FUNCTION: _include
+# @USAGE: _include <file>
 # @INTERNAL
-# @DEPRECATED
-# This helper function will be removed soon; don't use it.
-function include() {
-	if [[ -d ${1} ]]; then
-		for file in $( find ${1} -depth -mindepth 1 -type f -iname "*.direnv" ); do
-			source "${file}"
-		done
+#
+# @DESCRIPTION:
+# This helper function will read commands from <file> and execute them in the
+# current shell environment.
+#
+# It's a thin wrapper around shell built-in command ".", with the addiction of
+# a file locking mechanism to prevent concurrent execution of the entire
+# content of the given <file>.
+#
+# Beware, the locking mechanism has a time-out of 60 seconds, after which the
+# lock is released; this is necessary to avoid to stall infinitely in case the
+# commands from <file> got stuck due to undefined behaviours.
+#
+# NOTE: By default, the locks are stored in "${XDG_RUNTIME_DIR}/direnv", but
+# if the XDG environment variables are not available then it will fall back
+# to "/tmp/direnv-$USER".
+function _include() {
+	local file="${1}"
+
+	# Determine the location of the directory for storing the locks
+	if [[ -z $( echo "${LOCKER_ROOM}" ) ]]; then
+
+		# Try to determine a decent runtime path exclusive for the current user.
+		local runtime
+		if [[ -n "${XDG_RUNTIME_DIR}" ]]; then
+			runtime="${XDG_RUNTIME_DIR}/direnv/"
+		else
+			runtime="/tmp/direnv-$USER"
+		fi
+
+		LOCKER_ROOM="${runtime}/.locks/"
 	fi
+
+	# Prepare the lock
+	local lock_file="${file##*/}"
+	local lock_dir="${file//${lock_file}/}"
+	lock_dir="${LOCKER_ROOM}/$( basename ${lock_dir} )"
+	[ ! -d "${lock_dir}" ] && mkdir -p "${lock_dir}"
+
+	# Load the required <file> and guard it with a lock.
+	# NOTE: subsequent invocations of the same <file> from different shell
+	#       sessions will queue up, creating a queue of processes.
+	exec 200>"${lock_dir}"/${lock_file}.lock
+	flock -w 60 -x 200
+
+		. "${file}"
+
+	flock -u 200 # unlocking
 }
